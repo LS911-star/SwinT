@@ -1,0 +1,458 @@
+2024-01-25 14:11:08,926 - mmdet - INFO - Environment info:
+------------------------------------------------------------
+sys.platform: linux
+Python: 3.8.18 (default, Sep 11 2023, 13:40:15) [GCC 11.2.0]
+CUDA available: True
+GPU 0: NVIDIA GeForce RTX 3080
+CUDA_HOME: /environment/miniconda3
+NVCC: Build cuda_11.8.r11.8/compiler.31833905_0
+GCC: gcc (Ubuntu 9.3.0-17ubuntu1~20.04) 9.3.0
+PyTorch: 1.8.2
+PyTorch compiling details: PyTorch built with:
+  - GCC 7.3
+  - C++ Version: 201402
+  - Intel(R) oneAPI Math Kernel Library Version 2023.1-Product Build 20230303 for Intel(R) 64 architecture applications
+  - Intel(R) MKL-DNN v1.7.0 (Git Hash 7aed236906b1f7a05c0917e5257a1af05e9ff683)
+  - OpenMP 201511 (a.k.a. OpenMP 4.5)
+  - NNPACK is enabled
+  - CPU capability usage: AVX2
+  - CUDA Runtime 11.1
+  - NVCC architecture flags: -gencode;arch=compute_37,code=sm_37;-gencode;arch=compute_50,code=sm_50;-gencode;arch=compute_60,code=sm_60;-gencode;arch=compute_61,code=sm_61;-gencode;arch=compute_70,code=sm_70;-gencode;arch=compute_75,code=sm_75;-gencode;arch=compute_80,code=sm_80;-gencode;arch=compute_86,code=sm_86;-gencode;arch=compute_37,code=compute_37
+  - CuDNN 8.0.5
+  - Magma 2.5.2
+  - Build settings: BLAS_INFO=mkl, BUILD_TYPE=Release, CUDA_VERSION=11.1, CUDNN_VERSION=8.0.5, CXX_COMPILER=/opt/rh/devtoolset-7/root/usr/bin/c++, CXX_FLAGS= -Wno-deprecated -fvisibility-inlines-hidden -DUSE_PTHREADPOOL -fopenmp -DNDEBUG -DUSE_KINETO -DUSE_FBGEMM -DUSE_QNNPACK -DUSE_PYTORCH_QNNPACK -DUSE_XNNPACK -O2 -fPIC -Wno-narrowing -Wall -Wextra -Werror=return-type -Wno-missing-field-initializers -Wno-type-limits -Wno-array-bounds -Wno-unknown-pragmas -Wno-sign-compare -Wno-unused-parameter -Wno-unused-variable -Wno-unused-function -Wno-unused-result -Wno-unused-local-typedefs -Wno-strict-overflow -Wno-strict-aliasing -Wno-error=deprecated-declarations -Wno-stringop-overflow -Wno-psabi -Wno-error=pedantic -Wno-error=redundant-decls -Wno-error=old-style-cast -fdiagnostics-color=always -faligned-new -Wno-unused-but-set-variable -Wno-maybe-uninitialized -fno-math-errno -fno-trapping-math -Werror=format -Wno-stringop-overflow, LAPACK_INFO=mkl, PERF_WITH_AVX=1, PERF_WITH_AVX2=1, PERF_WITH_AVX512=1, TORCH_VERSION=1.8.2, USE_CUDA=ON, USE_CUDNN=ON, USE_EXCEPTION_PTR=1, USE_GFLAGS=OFF, USE_GLOG=OFF, USE_MKL=ON, USE_MKLDNN=ON, USE_MPI=OFF, USE_NCCL=ON, USE_NNPACK=ON, USE_OPENMP=ON, 
+
+TorchVision: 0.9.2
+OpenCV: 4.8.1
+MMCV: 1.4.0
+MMCV Compiler: GCC 9.3
+MMCV CUDA Compiler: 11.8
+MMDetection: 2.11.0+
+------------------------------------------------------------
+
+2024-01-25 14:11:09,838 - mmdet - INFO - Distributed training: False
+2024-01-25 14:11:10,727 - mmdet - INFO - Config:
+model = dict(
+    type='MaskRCNN',
+    pretrained=None,
+    backbone=dict(
+        type='SwinTransformer',
+        embed_dim=96,
+        depths=[2, 2, 6, 2],
+        num_heads=[3, 6, 12, 24],
+        window_size=7,
+        mlp_ratio=4.0,
+        qkv_bias=True,
+        qk_scale=None,
+        drop_rate=0.0,
+        attn_drop_rate=0.0,
+        drop_path_rate=0.1,
+        ape=False,
+        patch_norm=True,
+        out_indices=(0, 1, 2, 3),
+        use_checkpoint=False),
+    neck=dict(
+        type='FPN',
+        in_channels=[96, 192, 384, 768],
+        out_channels=256,
+        num_outs=5),
+    rpn_head=dict(
+        type='RPNHead',
+        in_channels=256,
+        feat_channels=256,
+        anchor_generator=dict(
+            type='AnchorGenerator',
+            scales=[8],
+            ratios=[0.5, 1.0, 2.0],
+            strides=[4, 8, 16, 32, 64]),
+        bbox_coder=dict(
+            type='DeltaXYWHBBoxCoder',
+            target_means=[0.0, 0.0, 0.0, 0.0],
+            target_stds=[1.0, 1.0, 1.0, 1.0]),
+        loss_cls=dict(
+            type='CrossEntropyLoss', use_sigmoid=True, loss_weight=1.0),
+        loss_bbox=dict(type='L1Loss', loss_weight=1.0)),
+    roi_head=dict(
+        type='StandardRoIHead',
+        bbox_roi_extractor=dict(
+            type='SingleRoIExtractor',
+            roi_layer=dict(type='RoIAlign', output_size=7, sampling_ratio=0),
+            out_channels=256,
+            featmap_strides=[4, 8, 16, 32]),
+        bbox_head=dict(
+            type='Shared2FCBBoxHead',
+            in_channels=256,
+            fc_out_channels=1024,
+            roi_feat_size=7,
+            num_classes=3,
+            bbox_coder=dict(
+                type='DeltaXYWHBBoxCoder',
+                target_means=[0.0, 0.0, 0.0, 0.0],
+                target_stds=[0.1, 0.1, 0.2, 0.2]),
+            reg_class_agnostic=False,
+            loss_cls=dict(
+                type='CrossEntropyLoss', use_sigmoid=False, loss_weight=1.0),
+            loss_bbox=dict(type='L1Loss', loss_weight=1.0)),
+        mask_roi_extractor=dict(
+            type='SingleRoIExtractor',
+            roi_layer=dict(type='RoIAlign', output_size=14, sampling_ratio=0),
+            out_channels=256,
+            featmap_strides=[4, 8, 16, 32]),
+        mask_head=dict(
+            type='FCNMaskHead',
+            num_convs=4,
+            in_channels=256,
+            conv_out_channels=256,
+            num_classes=3,
+            loss_mask=dict(
+                type='CrossEntropyLoss', use_mask=True, loss_weight=1.0))),
+    train_cfg=dict(
+        rpn=dict(
+            assigner=dict(
+                type='MaxIoUAssigner',
+                pos_iou_thr=0.7,
+                neg_iou_thr=0.3,
+                min_pos_iou=0.3,
+                match_low_quality=True,
+                ignore_iof_thr=-1),
+            sampler=dict(
+                type='RandomSampler',
+                num=256,
+                pos_fraction=0.5,
+                neg_pos_ub=-1,
+                add_gt_as_proposals=False),
+            allowed_border=-1,
+            pos_weight=-1,
+            debug=False),
+        rpn_proposal=dict(
+            nms_pre=2000,
+            max_per_img=1000,
+            nms=dict(type='nms', iou_threshold=0.7),
+            min_bbox_size=0),
+        rcnn=dict(
+            assigner=dict(
+                type='MaxIoUAssigner',
+                pos_iou_thr=0.5,
+                neg_iou_thr=0.5,
+                min_pos_iou=0.5,
+                match_low_quality=True,
+                ignore_iof_thr=-1),
+            sampler=dict(
+                type='RandomSampler',
+                num=512,
+                pos_fraction=0.25,
+                neg_pos_ub=-1,
+                add_gt_as_proposals=True),
+            mask_size=28,
+            pos_weight=-1,
+            debug=False)),
+    test_cfg=dict(
+        rpn=dict(
+            nms_pre=1000,
+            max_per_img=1000,
+            nms=dict(type='nms', iou_threshold=0.7),
+            min_bbox_size=0),
+        rcnn=dict(
+            score_thr=0.05,
+            nms=dict(type='nms', iou_threshold=0.5),
+            max_per_img=100,
+            mask_thr_binary=0.5)))
+dataset_type = 'CocoDataset'
+data_root = 'data/coco/'
+img_norm_cfg = dict(
+    mean=[123.675, 116.28, 103.53], std=[58.395, 57.12, 57.375], to_rgb=True)
+train_pipeline = [
+    dict(type='LoadImageFromFile'),
+    dict(type='LoadAnnotations', with_bbox=True, with_mask=True),
+    dict(type='RandomFlip', flip_ratio=0.5),
+    dict(
+        type='AutoAugment',
+        policies=[[{
+            'type': 'Resize',
+            'img_scale': [(224, 224)],
+            'multiscale_mode': 'value',
+            'keep_ratio': True
+        }],
+                  [{
+                      'type': 'Resize',
+                      'img_scale': [(224, 224)],
+                      'multiscale_mode': 'value',
+                      'keep_ratio': True
+                  }, {
+                      'type': 'RandomCrop',
+                      'crop_type': 'absolute_range',
+                      'crop_size': (384, 600),
+                      'allow_negative_crop': True
+                  }, {
+                      'type': 'Resize',
+                      'img_scale': [(224, 224)],
+                      'multiscale_mode': 'value',
+                      'override': True,
+                      'keep_ratio': True
+                  }]]),
+    dict(
+        type='Normalize',
+        mean=[123.675, 116.28, 103.53],
+        std=[58.395, 57.12, 57.375],
+        to_rgb=True),
+    dict(type='Pad', size_divisor=32),
+    dict(type='DefaultFormatBundle'),
+    dict(type='Collect', keys=['img', 'gt_bboxes', 'gt_labels', 'gt_masks'])
+]
+test_pipeline = [
+    dict(type='LoadImageFromFile'),
+    dict(
+        type='MultiScaleFlipAug',
+        img_scale=(224, 224),
+        flip=False,
+        transforms=[
+            dict(type='Resize', keep_ratio=True),
+            dict(type='RandomFlip'),
+            dict(
+                type='Normalize',
+                mean=[123.675, 116.28, 103.53],
+                std=[58.395, 57.12, 57.375],
+                to_rgb=True),
+            dict(type='Pad', size_divisor=32),
+            dict(type='ImageToTensor', keys=['img']),
+            dict(type='Collect', keys=['img'])
+        ])
+]
+data = dict(
+    samples_per_gpu=2,
+    workers_per_gpu=2,
+    train=dict(
+        type='CocoDataset',
+        ann_file='data/coco/annotations/instance_train.json',
+        img_prefix='data/coco/train/',
+        pipeline=[
+            dict(type='LoadImageFromFile'),
+            dict(type='LoadAnnotations', with_bbox=True, with_mask=True),
+            dict(type='RandomFlip', flip_ratio=0.5),
+            dict(
+                type='AutoAugment',
+                policies=[[{
+                    'type': 'Resize',
+                    'img_scale': [(224, 224)],
+                    'multiscale_mode': 'value',
+                    'keep_ratio': True
+                }],
+                          [{
+                              'type': 'Resize',
+                              'img_scale': [(224, 224)],
+                              'multiscale_mode': 'value',
+                              'keep_ratio': True
+                          }, {
+                              'type': 'RandomCrop',
+                              'crop_type': 'absolute_range',
+                              'crop_size': (384, 600),
+                              'allow_negative_crop': True
+                          }, {
+                              'type': 'Resize',
+                              'img_scale': [(224, 224)],
+                              'multiscale_mode': 'value',
+                              'override': True,
+                              'keep_ratio': True
+                          }]]),
+            dict(
+                type='Normalize',
+                mean=[123.675, 116.28, 103.53],
+                std=[58.395, 57.12, 57.375],
+                to_rgb=True),
+            dict(type='Pad', size_divisor=32),
+            dict(type='DefaultFormatBundle'),
+            dict(
+                type='Collect',
+                keys=['img', 'gt_bboxes', 'gt_labels', 'gt_masks'])
+        ]),
+    val=dict(
+        type='CocoDataset',
+        ann_file='data/coco/annotations/instance_val.json',
+        img_prefix='data/coco/val/',
+        pipeline=[
+            dict(type='LoadImageFromFile'),
+            dict(
+                type='MultiScaleFlipAug',
+                img_scale=(224, 224),
+                flip=False,
+                transforms=[
+                    dict(type='Resize', keep_ratio=True),
+                    dict(type='RandomFlip'),
+                    dict(
+                        type='Normalize',
+                        mean=[123.675, 116.28, 103.53],
+                        std=[58.395, 57.12, 57.375],
+                        to_rgb=True),
+                    dict(type='Pad', size_divisor=32),
+                    dict(type='ImageToTensor', keys=['img']),
+                    dict(type='Collect', keys=['img'])
+                ])
+        ]),
+    test=dict(
+        type='CocoDataset',
+        ann_file='data/coco/annotations/instance_test.json',
+        img_prefix='data/coco/test/',
+        pipeline=[
+            dict(type='LoadImageFromFile'),
+            dict(
+                type='MultiScaleFlipAug',
+                img_scale=(224, 224),
+                flip=False,
+                transforms=[
+                    dict(type='Resize', keep_ratio=True),
+                    dict(type='RandomFlip'),
+                    dict(
+                        type='Normalize',
+                        mean=[123.675, 116.28, 103.53],
+                        std=[58.395, 57.12, 57.375],
+                        to_rgb=True),
+                    dict(type='Pad', size_divisor=32),
+                    dict(type='ImageToTensor', keys=['img']),
+                    dict(type='Collect', keys=['img'])
+                ])
+        ]))
+evaluation = dict(interval=1, metric='bbox')
+optimizer = dict(
+    type='AdamW',
+    lr=0.0001,
+    betas=(0.9, 0.999),
+    weight_decay=0.05,
+    paramwise_cfg=dict(
+        custom_keys=dict(
+            absolute_pos_embed=dict(decay_mult=0.0),
+            relative_position_bias_table=dict(decay_mult=0.0),
+            norm=dict(decay_mult=0.0))))
+optimizer_config = dict(
+    grad_clip=None,
+    type='DistOptimizerHook',
+    update_interval=1,
+    coalesce=True,
+    bucket_size_mb=-1,
+    use_fp16=True)
+lr_config = dict(
+    policy='step',
+    warmup='linear',
+    warmup_iters=500,
+    warmup_ratio=0.001,
+    step=[8, 11])
+runner = dict(type='EpochBasedRunnerAmp', max_epochs=12)
+checkpoint_config = dict(interval=1)
+log_config = dict(interval=50, hooks=[dict(type='TextLoggerHook')])
+custom_hooks = [dict(type='NumClassCheckHook')]
+dist_params = dict(backend='nccl')
+log_level = 'INFO'
+load_from = '/home/featurize/work/Swin-Transformer-Object-Detection-master/mask_rcnn_swin_tiny_patch4_window7_1x.pth'
+resume_from = None
+workflow = [('train', 1)]
+fp16 = None
+work_dir = './work_dirs/mask_rcnn_swin_tiny_patch4_window7_mstrain_480-800_adamw_1x_coco'
+gpu_ids = range(0, 1)
+
+2024-01-25 14:11:37,940 - mmdet - INFO - load checkpoint from local path: /home/featurize/work/Swin-Transformer-Object-Detection-master/mask_rcnn_swin_tiny_patch4_window7_1x.pth
+2024-01-25 14:11:39,598 - mmdet - WARNING - The model and loaded state dict do not match exactly
+
+size mismatch for roi_head.bbox_head.fc_cls.weight: copying a param with shape torch.Size([81, 1024]) from checkpoint, the shape in current model is torch.Size([4, 1024]).
+size mismatch for roi_head.bbox_head.fc_cls.bias: copying a param with shape torch.Size([81]) from checkpoint, the shape in current model is torch.Size([4]).
+size mismatch for roi_head.bbox_head.fc_reg.weight: copying a param with shape torch.Size([320, 1024]) from checkpoint, the shape in current model is torch.Size([12, 1024]).
+size mismatch for roi_head.bbox_head.fc_reg.bias: copying a param with shape torch.Size([320]) from checkpoint, the shape in current model is torch.Size([12]).
+size mismatch for roi_head.mask_head.conv_logits.weight: copying a param with shape torch.Size([80, 256, 1, 1]) from checkpoint, the shape in current model is torch.Size([3, 256, 1, 1]).
+size mismatch for roi_head.mask_head.conv_logits.bias: copying a param with shape torch.Size([80]) from checkpoint, the shape in current model is torch.Size([3]).
+2024-01-25 14:11:39,601 - mmdet - INFO - Start running, host: featurize@featurize, work_dir: /home/featurize/work/Swin-Transformer-Object-Detection-master/work_dirs/mask_rcnn_swin_tiny_patch4_window7_mstrain_480-800_adamw_1x_coco
+2024-01-25 14:11:39,602 - mmdet - INFO - Hooks will be executed in the following order:
+before_run:
+(VERY_HIGH   ) StepLrUpdaterHook                  
+(ABOVE_NORMAL) DistOptimizerHook                  
+(NORMAL      ) CheckpointHook                     
+(NORMAL      ) EvalHook                           
+(VERY_LOW    ) TextLoggerHook                     
+ -------------------- 
+before_train_epoch:
+(VERY_HIGH   ) StepLrUpdaterHook                  
+(NORMAL      ) EvalHook                           
+(NORMAL      ) NumClassCheckHook                  
+(LOW         ) IterTimerHook                      
+(VERY_LOW    ) TextLoggerHook                     
+ -------------------- 
+before_train_iter:
+(VERY_HIGH   ) StepLrUpdaterHook                  
+(LOW         ) IterTimerHook                      
+ -------------------- 
+after_train_iter:
+(ABOVE_NORMAL) DistOptimizerHook                  
+(NORMAL      ) CheckpointHook                     
+(NORMAL      ) EvalHook                           
+(LOW         ) IterTimerHook                      
+(VERY_LOW    ) TextLoggerHook                     
+ -------------------- 
+after_train_epoch:
+(NORMAL      ) CheckpointHook                     
+(NORMAL      ) EvalHook                           
+(VERY_LOW    ) TextLoggerHook                     
+ -------------------- 
+before_val_epoch:
+(NORMAL      ) NumClassCheckHook                  
+(LOW         ) IterTimerHook                      
+(VERY_LOW    ) TextLoggerHook                     
+ -------------------- 
+before_val_iter:
+(LOW         ) IterTimerHook                      
+ -------------------- 
+after_val_iter:
+(LOW         ) IterTimerHook                      
+ -------------------- 
+after_val_epoch:
+(VERY_LOW    ) TextLoggerHook                     
+ -------------------- 
+after_run:
+(VERY_LOW    ) TextLoggerHook                     
+ -------------------- 
+2024-01-25 14:11:39,602 - mmdet - INFO - workflow: [('train', 1)], max: 12 epochs
+2024-01-25 14:11:39,603 - mmdet - INFO - Checkpoints will be saved to /home/featurize/work/Swin-Transformer-Object-Detection-master/work_dirs/mask_rcnn_swin_tiny_patch4_window7_mstrain_480-800_adamw_1x_coco by HardDiskBackend.
+2024-01-25 14:11:49,775 - mmdet - INFO - Saving checkpoint at 1 epochs
+2024-01-25 14:11:52,135 - mmdet - INFO - Evaluating bbox...
+2024-01-25 14:11:52,284 - mmdet - INFO - Exp name: mask_rcnn_swin_tiny_patch4_window7_mstrain_480-800_adamw_1x_coco.py
+2024-01-25 14:11:52,284 - mmdet - INFO - Epoch(val) [1][12]	bbox_mAP: 0.0000, bbox_mAP_50: 0.0000, bbox_mAP_75: 0.0000, bbox_mAP_s: -1.0000, bbox_mAP_m: 0.0000, bbox_mAP_l: 0.0000, bbox_mAP_copypaste: 0.000 0.000 0.000 -1.000 0.000 0.000
+2024-01-25 14:11:56,489 - mmdet - INFO - Saving checkpoint at 2 epochs
+2024-01-25 14:11:58,646 - mmdet - INFO - Evaluating bbox...
+2024-01-25 14:11:58,686 - mmdet - INFO - Exp name: mask_rcnn_swin_tiny_patch4_window7_mstrain_480-800_adamw_1x_coco.py
+2024-01-25 14:11:58,686 - mmdet - INFO - Epoch(val) [2][12]	bbox_mAP: 0.0000, bbox_mAP_50: 0.0000, bbox_mAP_75: 0.0000, bbox_mAP_s: -1.0000, bbox_mAP_m: 0.0000, bbox_mAP_l: 0.0000, bbox_mAP_copypaste: 0.000 0.000 0.000 -1.000 0.000 0.000
+2024-01-25 14:12:02,806 - mmdet - INFO - Saving checkpoint at 3 epochs
+2024-01-25 14:12:04,873 - mmdet - INFO - Evaluating bbox...
+2024-01-25 14:12:04,905 - mmdet - INFO - Exp name: mask_rcnn_swin_tiny_patch4_window7_mstrain_480-800_adamw_1x_coco.py
+2024-01-25 14:12:04,905 - mmdet - INFO - Epoch(val) [3][12]	bbox_mAP: 0.0000, bbox_mAP_50: 0.0000, bbox_mAP_75: 0.0000, bbox_mAP_s: -1.0000, bbox_mAP_m: 0.0000, bbox_mAP_l: 0.0000, bbox_mAP_copypaste: 0.000 0.000 0.000 -1.000 0.000 0.000
+2024-01-25 14:12:09,039 - mmdet - INFO - Saving checkpoint at 4 epochs
+2024-01-25 14:12:11,597 - mmdet - INFO - Evaluating bbox...
+2024-01-25 14:12:11,629 - mmdet - INFO - Exp name: mask_rcnn_swin_tiny_patch4_window7_mstrain_480-800_adamw_1x_coco.py
+2024-01-25 14:12:11,629 - mmdet - INFO - Epoch(val) [4][12]	bbox_mAP: 0.0000, bbox_mAP_50: 0.0000, bbox_mAP_75: 0.0000, bbox_mAP_s: -1.0000, bbox_mAP_m: 0.0000, bbox_mAP_l: 0.0000, bbox_mAP_copypaste: 0.000 0.000 0.000 -1.000 0.000 0.000
+2024-01-25 14:12:15,726 - mmdet - INFO - Saving checkpoint at 5 epochs
+2024-01-25 14:12:18,006 - mmdet - INFO - Evaluating bbox...
+2024-01-25 14:12:18,037 - mmdet - INFO - Exp name: mask_rcnn_swin_tiny_patch4_window7_mstrain_480-800_adamw_1x_coco.py
+2024-01-25 14:12:18,037 - mmdet - INFO - Epoch(val) [5][12]	bbox_mAP: 0.0000, bbox_mAP_50: 0.0000, bbox_mAP_75: 0.0000, bbox_mAP_s: -1.0000, bbox_mAP_m: 0.0000, bbox_mAP_l: 0.0000, bbox_mAP_copypaste: 0.000 0.000 0.000 -1.000 0.000 0.000
+2024-01-25 14:12:22,169 - mmdet - INFO - Saving checkpoint at 6 epochs
+2024-01-25 14:12:25,500 - mmdet - INFO - Evaluating bbox...
+2024-01-25 14:12:25,529 - mmdet - INFO - Exp name: mask_rcnn_swin_tiny_patch4_window7_mstrain_480-800_adamw_1x_coco.py
+2024-01-25 14:12:25,529 - mmdet - INFO - Epoch(val) [6][12]	bbox_mAP: 0.0000, bbox_mAP_50: 0.0000, bbox_mAP_75: 0.0000, bbox_mAP_s: -1.0000, bbox_mAP_m: 0.0000, bbox_mAP_l: 0.0000, bbox_mAP_copypaste: 0.000 0.000 0.000 -1.000 0.000 0.000
+2024-01-25 14:12:29,849 - mmdet - INFO - Saving checkpoint at 7 epochs
+2024-01-25 14:12:32,287 - mmdet - INFO - Evaluating bbox...
+2024-01-25 14:12:32,321 - mmdet - INFO - Exp name: mask_rcnn_swin_tiny_patch4_window7_mstrain_480-800_adamw_1x_coco.py
+2024-01-25 14:12:32,321 - mmdet - INFO - Epoch(val) [7][12]	bbox_mAP: 0.0020, bbox_mAP_50: 0.0030, bbox_mAP_75: 0.0010, bbox_mAP_s: -1.0000, bbox_mAP_m: 0.0040, bbox_mAP_l: 0.2670, bbox_mAP_copypaste: 0.002 0.003 0.001 -1.000 0.004 0.267
+2024-01-25 14:12:36,582 - mmdet - INFO - Saving checkpoint at 8 epochs
+2024-01-25 14:12:39,397 - mmdet - INFO - Evaluating bbox...
+2024-01-25 14:12:39,427 - mmdet - INFO - Exp name: mask_rcnn_swin_tiny_patch4_window7_mstrain_480-800_adamw_1x_coco.py
+2024-01-25 14:12:39,427 - mmdet - INFO - Epoch(val) [8][12]	bbox_mAP: 0.0090, bbox_mAP_50: 0.0140, bbox_mAP_75: 0.0100, bbox_mAP_s: -1.0000, bbox_mAP_m: 0.0350, bbox_mAP_l: 0.8000, bbox_mAP_copypaste: 0.009 0.014 0.010 -1.000 0.035 0.800
+2024-01-25 14:12:43,772 - mmdet - INFO - Saving checkpoint at 9 epochs
+2024-01-25 14:12:46,599 - mmdet - INFO - Evaluating bbox...
+2024-01-25 14:12:46,631 - mmdet - INFO - Exp name: mask_rcnn_swin_tiny_patch4_window7_mstrain_480-800_adamw_1x_coco.py
+2024-01-25 14:12:46,631 - mmdet - INFO - Epoch(val) [9][12]	bbox_mAP: 0.0090, bbox_mAP_50: 0.0150, bbox_mAP_75: 0.0110, bbox_mAP_s: -1.0000, bbox_mAP_m: 0.0390, bbox_mAP_l: 0.4000, bbox_mAP_copypaste: 0.009 0.015 0.011 -1.000 0.039 0.400
+2024-01-25 14:12:51,006 - mmdet - INFO - Saving checkpoint at 10 epochs
+2024-01-25 14:12:53,298 - mmdet - INFO - Evaluating bbox...
+2024-01-25 14:12:53,331 - mmdet - INFO - Exp name: mask_rcnn_swin_tiny_patch4_window7_mstrain_480-800_adamw_1x_coco.py
+2024-01-25 14:12:53,331 - mmdet - INFO - Epoch(val) [10][12]	bbox_mAP: 0.0100, bbox_mAP_50: 0.0160, bbox_mAP_75: 0.0110, bbox_mAP_s: -1.0000, bbox_mAP_m: 0.0400, bbox_mAP_l: 0.8000, bbox_mAP_copypaste: 0.010 0.016 0.011 -1.000 0.040 0.800
+2024-01-25 14:12:57,752 - mmdet - INFO - Saving checkpoint at 11 epochs
+2024-01-25 14:13:00,101 - mmdet - INFO - Evaluating bbox...
+2024-01-25 14:13:00,131 - mmdet - INFO - Exp name: mask_rcnn_swin_tiny_patch4_window7_mstrain_480-800_adamw_1x_coco.py
+2024-01-25 14:13:00,131 - mmdet - INFO - Epoch(val) [11][12]	bbox_mAP: 0.0100, bbox_mAP_50: 0.0160, bbox_mAP_75: 0.0120, bbox_mAP_s: -1.0000, bbox_mAP_m: 0.0450, bbox_mAP_l: 0.7000, bbox_mAP_copypaste: 0.010 0.016 0.012 -1.000 0.045 0.700
+2024-01-25 14:13:04,507 - mmdet - INFO - Saving checkpoint at 12 epochs
+2024-01-25 14:13:06,586 - mmdet - INFO - Evaluating bbox...
+2024-01-25 14:13:06,616 - mmdet - INFO - Exp name: mask_rcnn_swin_tiny_patch4_window7_mstrain_480-800_adamw_1x_coco.py
+2024-01-25 14:13:06,616 - mmdet - INFO - Epoch(val) [12][12]	bbox_mAP: 0.0090, bbox_mAP_50: 0.0150, bbox_mAP_75: 0.0110, bbox_mAP_s: -1.0000, bbox_mAP_m: 0.0420, bbox_mAP_l: 0.7000, bbox_mAP_copypaste: 0.009 0.015 0.011 -1.000 0.042 0.700
